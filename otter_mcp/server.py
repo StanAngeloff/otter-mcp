@@ -105,14 +105,21 @@ async def list_conversations(
 
 @mcp.tool()
 async def search(ctx: Context, query: str) -> str:
-    """Search conversations by text query.
+    """Search conversations by title. Returns matching conversation IDs and names."""
+    client = _client(ctx)
+    data = await client.search(query)
 
-    Not yet implemented — a HAR capture of the search flow is needed.
-    """
-    return (
-        "Search is not yet implemented. "
-        "A HAR capture of the search flow is needed to reverse-engineer the endpoint."
-    )
+    lines = []
+    for c in data.get("conversations", []):
+        otid = c.get("id", "?")
+        name = c.get("name", "Untitled")
+        date = _format_ts(c.get("start_time"))
+        lines.append(f"{otid} | {date} | {name}")
+
+    if not lines:
+        lines.append("No conversations found.")
+
+    return "\n".join(lines)
 
 
 @mcp.tool()

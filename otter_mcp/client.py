@@ -189,11 +189,11 @@ class OtterClient:
         }
         return self._speakers
 
-    async def search(
-        self, query: str, size: int = 500, otid: str | None = None
-    ) -> dict:
-        raise NotImplementedError(
-            "Search not yet implemented — awaiting HAR capture"
+    async def search(self, query: str) -> dict:
+        return await self._request(
+            "GET",
+            "get_best_search_matches",
+            params={"search_string": query},
         )
 
     # ── Stubbed endpoints (not exposed as MCP tools yet) ───────────────
