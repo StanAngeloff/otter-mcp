@@ -58,13 +58,13 @@ def _format_ts(epoch: int | float | None) -> str:
     return dt.strftime("%Y-%m-%d %H:%M")
 
 
-def _format_offset(ms: int) -> str:
-    total_seconds = ms // 1000
+def _format_offset(samples: int) -> str:
+    total_seconds = samples // 16000
     h, remainder = divmod(total_seconds, 3600)
     m, s = divmod(remainder, 60)
     if h:
         return f"{h}:{m:02d}:{s:02d}"
-    return f"{m:02d}:{s:02d}"
+    return f"{m}:{s:02d}"
 
 
 @mcp.tool()
@@ -135,8 +135,22 @@ async def get_transcript(ctx: Context, otid: str) -> str:
     transcripts = speech.get("transcripts", [])
     transcripts.sort(key=lambda t: t.get("start_offset", 0))
 
+    unknown_labels: dict[str, int] = {}
+    unknown_counter = 0
+
+    def _speaker_name(speaker_id: int | None, label: str | None) -> str:
+        nonlocal unknown_counter
+        if speaker_id is not None:
+            return speakers.get(speaker_id, f"Speaker {speaker_id}")
+        if label is not None:
+            if label not in unknown_labels:
+                unknown_counter += 1
+                unknown_labels[label] = unknown_counter
+            return f"Speaker {unknown_labels[label]}"
+        return "Unknown Speaker"
+
     prev_speaker: str | None = None
-    prev_ts = "00:00"
+    prev_ts = "0:00"
     pending: list[str] = []
 
     def flush() -> None:
@@ -149,8 +163,7 @@ async def get_transcript(ctx: Context, otid: str) -> str:
         pending = []
 
     for t in transcripts:
-        speaker_id = t.get("speaker_id")
-        speaker_name = speakers.get(speaker_id, f"Speaker {speaker_id}")
+        speaker_name = _speaker_name(t.get("speaker_id"), t.get("label"))
         text = t.get("transcript", "").strip()
         ts = _format_offset(t.get("start_offset", 0))
 
