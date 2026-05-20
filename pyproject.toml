@@ -1,0 +1,12 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "otter-mcp"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = ["mcp>=1.27", "pyotp>=2.9"]
+
+[project.scripts]
+otter-mcp = "otter_mcp.server:main"
