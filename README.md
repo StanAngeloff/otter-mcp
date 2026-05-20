@@ -14,11 +14,11 @@ In short: if you can see it in the browser, you should be able to access it via 
 
 These are the tools I built for my own workflow. They cover what I need day-to-day:
 
-| Tool | Description |
-|---|---|
-| `list_conversations` | Paginated homepage feed — everything you see in the web UI |
-| `search` | Find conversations by title |
-| `get_transcript` | Full speaker-attributed transcript with timestamps, identical to the web export |
+| Tool                 | Description                                                                     |
+| -------------------- | ------------------------------------------------------------------------------- |
+| `list_conversations` | Paginated homepage feed — everything you see in the web UI                      |
+| `search`             | Find conversations by title                                                     |
+| `get_transcript`     | Full speaker-attributed transcript with timestamps, identical to the web export |
 
 ### Adding more tools
 
@@ -32,11 +32,11 @@ uv run otter-mcp
 
 Requires three environment variables:
 
-| Variable | Description |
-|---|---|
-| `OTTER_EMAIL` | Your Otter.ai email |
-| `OTTER_PASSWORD` | Your Otter.ai password |
-| `OTTER_TOTP_SECRET` | Your TOTP 2FA secret |
+| Variable            | Description            |
+| ------------------- | ---------------------- |
+| `OTTER_EMAIL`       | Your Otter.ai email    |
+| `OTTER_PASSWORD`    | Your Otter.ai password |
+| `OTTER_TOTP_SECRET` | Your TOTP 2FA secret   |
 
 Session cookies are persisted to `$XDG_STATE_HOME/otter-mcp/cookies.json` (`~/.local/state` by default), so the login + 2FA dance only happens when the session actually expires.
 
