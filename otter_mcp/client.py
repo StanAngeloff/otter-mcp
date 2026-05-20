@@ -10,9 +10,10 @@ import pyotp
 
 API_BASE = "https://otter.ai/forward/api/v1/"
 
-_STATE_DIR = Path(
-    os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state")
-) / "otter-mcp"
+_STATE_DIR = (
+    Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+    / "otter-mcp"
+)
 _COOKIE_PATH = _STATE_DIR / "cookies.json"
 
 
@@ -31,12 +32,14 @@ def _save_cookies(jar: httpx.Cookies) -> None:
     _STATE_DIR.mkdir(parents=True, exist_ok=True)
     entries = []
     for cookie in jar.jar:
-        entries.append({
-            "name": cookie.name,
-            "value": cookie.value,
-            "domain": cookie.domain,
-            "path": cookie.path,
-        })
+        entries.append(
+            {
+                "name": cookie.name,
+                "value": cookie.value,
+                "domain": cookie.domain,
+                "path": cookie.path,
+            }
+        )
     _COOKIE_PATH.write_text(json.dumps(entries, indent=2))
     _COOKIE_PATH.chmod(0o600)
 
@@ -106,9 +109,7 @@ class OtterClient:
         if resp.status_code != 200:
             raise OtterError(f"OTP verification failed with status {resp.status_code}")
 
-        profile = await self._http.get(
-            "user/profile", headers=self._csrf_headers()
-        )
+        profile = await self._http.get("user/profile", headers=self._csrf_headers())
         if profile.status_code != 200:
             raise OtterError(f"Profile fetch failed with status {profile.status_code}")
         user = profile.json().get("user", {})
@@ -119,17 +120,13 @@ class OtterClient:
     async def try_resume(self) -> bool:
         if not self._csrf:
             return False
-        resp = await self._http.get(
-            "login_csrf", headers=self._csrf_headers()
-        )
+        resp = await self._http.get("login_csrf", headers=self._csrf_headers())
         if resp.status_code != 200:
             return False
         data = resp.json()
         if not data.get("logged-in"):
             return False
-        profile = await self._http.get(
-            "user/profile", headers=self._csrf_headers()
-        )
+        profile = await self._http.get("user/profile", headers=self._csrf_headers())
         if profile.status_code != 200:
             return False
         user = profile.json().get("user", {})
@@ -181,12 +178,8 @@ class OtterClient:
     async def get_speakers(self) -> dict[int, str]:
         if self._speakers is not None:
             return self._speakers
-        data = await self._request(
-            "GET", "speakers", params={"user_id": self._userid}
-        )
-        self._speakers = {
-            s["id"]: s["speaker_name"] for s in data.get("speakers", [])
-        }
+        data = await self._request("GET", "speakers", params={"user_id": self._userid})
+        self._speakers = {s["id"]: s["speaker_name"] for s in data.get("speakers", [])}
         return self._speakers
 
     async def search(self, query: str) -> dict:
@@ -200,15 +193,11 @@ class OtterClient:
 
     async def get_summary(self, otid: str) -> dict:
         # TODO: expose as MCP tool
-        return await self._request(
-            "GET", "abstract_summary", params={"otid": otid}
-        )
+        return await self._request("GET", "abstract_summary", params={"otid": otid})
 
     async def get_action_items(self, otid: str) -> dict:
         # TODO: expose as MCP tool
-        return await self._request(
-            "GET", "speech_action_items", params={"otid": otid}
-        )
+        return await self._request("GET", "speech_action_items", params={"otid": otid})
 
     async def get_folders(self) -> dict:
         # TODO: expose as MCP tool
